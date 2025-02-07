@@ -1,1 +1,2 @@
-# Francium-Notification<br/>Notification server for Francium Social Networking
+# Francium-Notification
+Notification server for Francium Social Networking

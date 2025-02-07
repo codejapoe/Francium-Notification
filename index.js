@@ -18,7 +18,7 @@ client.setEndpoint(appwriteConfig.url);
 client.setProject(appwriteConfig.projectId);
 
 const databases = new Databases(client);
-process.env.GOOGLE_APPLICATION_CREDENTIALS = "/Users/aungkaungkhant/Documents/Francium-Notification/francium-app-firebase-adminsdk-mu0n8-5a0b80b045.json";
+process.env.GOOGLE_APPLICATION_CREDENTIALS = "./francium-app-firebase-adminsdk-mu0n8-5a0b80b045.json";
 
 const app = express();
 app.use(express.json());

@@ -10,6 +10,8 @@ const appwriteConfig = {
     databaseID: 'francium',
     userCollectionID: 'users',
     postCollectionID: 'posts',
+    commentCollectionID: 'comments',
+    notificationCollectionID: 'notifications',
 }
 
 const client = new Client();
@@ -45,16 +47,16 @@ initializeApp({
   projectId: 'francium-app',
 });
 
-// POST { 'username': 'example', 'userID2': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd' }
 app.post("/follow", async function (req, res) {
     try {
         const username = req.body.username;
-        const userID2 = req.body.userID2;
+        const userID = req.body.userID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
-                Query.equal('$id', userID2)
+                Query.equal('$id', userID)
             ]
         );
 
@@ -80,16 +82,16 @@ app.post("/follow", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID2': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd' }
 app.post("/like", async function (req, res) {
     try {
         const username = req.body.username;
-        const userID2 = req.body.userID2;
+        const userID = req.body.userID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
-                Query.equal('$id', userID2)
+                Query.equal('$id', userID)
             ]
         );
 
@@ -115,16 +117,16 @@ app.post("/like", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID2': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd' }
 app.post("/comment", async function (req, res) {
     try {
         const username = req.body.username;
-        const userID2 = req.body.userID2;
+        const userID = req.body.userID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
-                Query.equal('$id', userID2)
+                Query.equal('$id', userID)
             ]
         );
 
@@ -150,16 +152,16 @@ app.post("/comment", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID2': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd' }
 app.post("/repost", async function (req, res) {
     try {
         const username = req.body.username;
-        const userID2 = req.body.userID2;
+        const userID = req.body.userID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
-                Query.equal('$id', userID2)
+                Query.equal('$id', userID)
             ]
         );
 
@@ -185,16 +187,16 @@ app.post("/repost", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID2': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd' }
 app.post("/tag", async function (req, res) {
     try {
         const username = req.body.username;
-        const userID2 = req.body.userID2;
+        const userID = req.body.userID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
-                Query.equal('$id', userID2)
+                Query.equal('$id', userID)
             ]
         );
 
@@ -224,6 +226,7 @@ app.post("/tag", async function (req, res) {
 app.post("/post", async function (req, res) {
     try {
         const username = req.body.username;
+        const notificationID = req.body.notificationID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
@@ -258,6 +261,28 @@ app.post("/post", async function (req, res) {
                     })
                 );
                 allPromises.push(...tokenPromises);
+            }
+        }
+
+        for (const follower of response.documents[0].followers) {
+            const response2 = await databases.listDocuments(
+                appwriteConfig.databaseID,
+                appwriteConfig.userCollectionID,
+                [
+                    Query.equal('$id', follower)
+                ]
+            );
+            
+            if (response2.documents.length) {
+                const currentNotifications = response2.documents[0].notifications || [];
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    follower,
+                    {
+                        notifications: [notificationID, ...currentNotifications]
+                    }
+                );
             }
         }
         

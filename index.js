@@ -27,7 +27,7 @@ app.use(express.json());
 
 app.use(
   cors({
-    origin: "*",
+    origin: "https://francium-app.web.app",
   })
 );
 
@@ -53,7 +53,7 @@ app.post("/follow", async function (req, res) {
         const username = req.body.username;
         const userID = req.body.userID;
         
-        const res = await databases.listDocuments(
+        const response0 = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
             [
@@ -78,7 +78,7 @@ app.post("/follow", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " started following you.",
-                    imageUrl: res.documents[0].profile
+                    imageUrl: response0.documents[0].profile
                 },
                 token: token,
             })

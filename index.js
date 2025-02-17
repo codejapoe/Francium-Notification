@@ -52,6 +52,15 @@ app.post("/follow", async function (req, res) {
     try {
         const username = req.body.username;
         const userID = req.body.userID;
+        
+        const res = await databases.listDocuments(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            [
+                Query.equal('username', username)
+            ]
+        );
+
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
@@ -69,6 +78,7 @@ app.post("/follow", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " started following you.",
+                    imageUrl: res.documents[0].profile
                 },
                 token: token,
             })
@@ -104,6 +114,7 @@ app.post("/like", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " liked your post.",
+                    imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                 },
                 token: token,
             })
@@ -139,6 +150,7 @@ app.post("/comment", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " commented on your post.",
+                    imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                 },
                 token: token,
             })
@@ -174,6 +186,7 @@ app.post("/repost", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " reposted your post.",
+                    imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                 },
                 token: token,
             })
@@ -209,6 +222,7 @@ app.post("/tag", async function (req, res) {
                 notification: {
                     title: "Francium",
                     body: username + " tagged you in their post.",
+                    imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                 },
                 token: token,
             })
@@ -256,6 +270,7 @@ app.post("/post", async function (req, res) {
                         notification: {
                             title: "Francium",
                             body: response.documents[0].username + " added a new post.",
+                        imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                         },
                         token: token,
                     })

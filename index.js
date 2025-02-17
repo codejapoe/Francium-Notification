@@ -270,7 +270,7 @@ app.post("/post", async function (req, res) {
                         notification: {
                             title: "Francium",
                             body: response.documents[0].username + " added a new post.",
-                        imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
+                            imageUrl: "https://cloud.appwrite.io/v1/storage/buckets/images/files/icon/view?project=francium&mode=admin"
                         },
                         token: token,
                     })

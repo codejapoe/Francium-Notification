@@ -76,7 +76,7 @@ app.post("/follow", async function (req, res) {
         const sendPromises = response.documents[0].fcm.map(token => 
             getMessaging().send({
                 notification: {
-                    title: "Francium",
+                    title: "New Follower",
                     body: username + " started following you.",
                     imageUrl: response0.documents[0].profile
                 },
@@ -112,7 +112,7 @@ app.post("/like", async function (req, res) {
         const sendPromises = response.documents[0].fcm.map(token => 
             getMessaging().send({
                 notification: {
-                    title: "Francium",
+                    title: "New Notification",
                     body: username + " liked your post.",
                 },
                 token: token,
@@ -147,7 +147,7 @@ app.post("/comment", async function (req, res) {
         const sendPromises = response.documents[0].fcm.map(token => 
             getMessaging().send({
                 notification: {
-                    title: "Francium",
+                    title: "New Notification",
                     body: username + " commented on your post.",
                 },
                 token: token,
@@ -182,7 +182,7 @@ app.post("/repost", async function (req, res) {
         const sendPromises = response.documents[0].fcm.map(token => 
             getMessaging().send({
                 notification: {
-                    title: "Francium",
+                    title: "New Notification",
                     body: username + " reposted your post.",
                 },
                 token: token,
@@ -217,7 +217,7 @@ app.post("/tag", async function (req, res) {
         const sendPromises = response.documents[0].fcm.map(token => 
             getMessaging().send({
                 notification: {
-                    title: "Francium",
+                    title: "New Notification",
                     body: username + " tagged you in their post.",
                 },
                 token: token,
@@ -264,7 +264,7 @@ app.post("/post", async function (req, res) {
                 const tokenPromises = response2.documents[0].fcm.map(token => 
                     getMessaging().send({
                         notification: {
-                            title: "Francium",
+                            title: "New Notification",
                             body: response.documents[0].username + " added a new post.",
                         },
                         token: token,

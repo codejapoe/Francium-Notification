@@ -1,8 +1,18 @@
-import {initializeApp, cert } from 'firebase-admin/app';
+import { initializeApp, cert } from 'firebase-admin/app';
 import { getMessaging } from "firebase-admin/messaging";
 import express from "express";
 import cors from "cors";
 import { Client, Databases, Query } from 'appwrite'
+import { createRequire } from 'module';
+
+const require = createRequire(import.meta.url);
+
+var serviceAccount = require("./francium-app-firebase-adminsdk-mu0n8-a588c80e12.json");
+
+initializeApp({
+  credential: cert(serviceAccount),
+  databaseURL: "https://francium-app-default-rtdb.firebaseio.com"
+});
 
 const appwriteConfig = {
     url: 'https://cloud.appwrite.io/v1',
@@ -20,7 +30,6 @@ client.setEndpoint(appwriteConfig.url);
 client.setProject(appwriteConfig.projectId);
 
 const databases = new Databases(client);
-process.env.GOOGLE_APPLICATION_CREDENTIALS = "./francium-app-firebase-adminsdk-mu0n8-5a0b80b045.json";
 
 const app = express();
 app.use(express.json());
@@ -40,11 +49,6 @@ app.use(
 app.use(function(req, res, next) {
   res.setHeader("Content-Type", "application/json");
   next();
-});
-
-initializeApp({
-    credential: cert("./francium-app-firebase-adminsdk-mu0n8-5a0b80b045.json"),
-  projectId: 'francium-app',
 });
 
 // POST { 'username': 'example', 'userID': '123456asd' }
@@ -73,18 +77,39 @@ app.post("/follow", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        const sendPromises = response.documents[0].fcm.map(token => 
-            getMessaging().send({
-                notification: {
-                    title: "New Follower",
-                    body: username + " started following you.",
-                    imageUrl: response0.documents[0].profile
-                },
-                token: token,
-            })
-        );
+        const validTokens = [];
+        const sendPromises = response.documents[0].fcm.map(async token => {
+            try {
+                await getMessaging().send({
+                    notification: {
+                        title: "New Follower",
+                        body: username + " started following you.",
+                        imageUrl: response0.documents[0].profile
+                    },
+                    token: token,
+                });
+                validTokens.push(token);
+            } catch (error) {
+                console.error('Error sending notification to token:', token, error);
+                return null;
+            }
+        });
         
         await Promise.all(sendPromises);
+
+        // Update FCM tokens if any were invalid
+        if (validTokens.length !== response.documents[0].fcm.length) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userID,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens:', error);
+            }
+        }
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);
@@ -109,17 +134,39 @@ app.post("/like", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        const sendPromises = response.documents[0].fcm.map(token => 
-            getMessaging().send({
-                notification: {
-                    title: "New Notification",
-                    body: username + " liked your post.",
-                },
-                token: token,
-            })
-        );
+        const validTokens = [];
+        const sendPromises = response.documents[0].fcm.map(async token => {
+            try {
+                await getMessaging().send({
+                    notification: {
+                        title: "New Notification",
+                        body: username + " liked your post.",
+                    },
+                    token: token,
+                });
+                validTokens.push(token);
+            } catch (error) {
+                console.error('Error sending notification to token:', token, error);
+                return null;
+            }
+        });
         
         await Promise.all(sendPromises);
+
+        // Update FCM tokens if any were invalid
+        if (validTokens.length !== response.documents[0].fcm.length) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userID,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens:', error);
+            }
+        }
+        
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);
@@ -144,17 +191,38 @@ app.post("/comment", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        const sendPromises = response.documents[0].fcm.map(token => 
-            getMessaging().send({
-                notification: {
-                    title: "New Notification",
-                    body: username + " commented on your post.",
-                },
-                token: token,
-            })
-        );
+        const validTokens = [];
+        const sendPromises = response.documents[0].fcm.map(async token => {
+            try {
+                await getMessaging().send({
+                    notification: {
+                        title: "New Notification",
+                        body: username + " commented on your post.",
+                    },
+                    token: token,
+                })
+                validTokens.push(token);
+            } catch (error) {
+                console.error('Error sending notification to token:', token, error);
+                return null;
+            }
+        });
         
         await Promise.all(sendPromises);
+
+        // Update FCM tokens if any were invalid
+        if (validTokens.length !== response.documents[0].fcm.length) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userID,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens:', error);
+            }
+        }
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);
@@ -179,17 +247,38 @@ app.post("/repost", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
-        const sendPromises = response.documents[0].fcm.map(token => 
-            getMessaging().send({
-                notification: {
-                    title: "New Notification",
-                    body: username + " reposted your post.",
-                },
-                token: token,
-            })
-        );
+        const validTokens = [];
+        const sendPromises = response.documents[0].fcm.map(async token => {
+            try {
+                await getMessaging().send({
+                    notification: {
+                        title: "New Notification",
+                        body: username + " reposted your post.",
+                    },
+                    token: token,
+                });
+                validTokens.push(token);
+            } catch (error) {
+                console.error('Error sending notification to token:', token, error);
+                return null;
+            }
+        });
         
         await Promise.all(sendPromises);
+
+        // Update FCM tokens if any were invalid
+        if (validTokens.length !== response.documents[0].fcm.length) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userID,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens:', error);
+            }
+        }
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);
@@ -213,18 +302,39 @@ app.post("/tag", async function (req, res) {
         if (!response.documents.length) {
             return res.status(404).json({ error: 'User not found.' });
         }
-
-        const sendPromises = response.documents[0].fcm.map(token => 
-            getMessaging().send({
-                notification: {
-                    title: "New Notification",
-                    body: username + " tagged you in their post.",
-                },
-                token: token,
-            })
-        );
+        
+        const validTokens = [];
+        const sendPromises = response.documents[0].fcm.map(async token => {
+            try {
+                await getMessaging().send({
+                    notification: {
+                        title: "New Notification",
+                        body: username + " tagged you in their post.",
+                    },
+                    token: token,
+                });
+                validTokens.push(token);
+            } catch (error) {
+                console.error('Error sending notification to token:', token, error);
+                return null;
+            }
+        });
         
         await Promise.all(sendPromises);
+
+        // Update FCM tokens if any were invalid
+        if (validTokens.length !== response.documents[0].fcm.length) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userID,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens:', error);
+            }
+        }
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);
@@ -250,6 +360,7 @@ app.post("/post", async function (req, res) {
         }
 
         const allPromises = [];
+        const tokenUpdates = new Map(); // Track tokens for each user
         
         for (const favor of response.documents[0].favors) {
             const response2 = await databases.listDocuments(
@@ -261,19 +372,48 @@ app.post("/post", async function (req, res) {
             );
             
             if (response2.documents.length) {
-                const tokenPromises = response2.documents[0].fcm.map(token => 
-                    getMessaging().send({
-                        notification: {
-                            title: "New Notification",
-                            body: response.documents[0].username + " added a new post.",
-                        },
-                        token: token,
-                    })
-                );
+                const validTokens = [];
+                const tokenPromises = response2.documents[0].fcm.map(async token => {
+                    try {
+                        await getMessaging().send({
+                            notification: {
+                                title: "New Notification",
+                                body: response.documents[0].username + " added a new post.",
+                            },
+                            token: token,
+                        });
+                        validTokens.push(token);
+                    } catch (error) {
+                        console.error('Error sending notification to token:', token, error);
+                        return null;
+                    }
+                });
                 allPromises.push(...tokenPromises);
+                
+                // Store valid tokens for this user if any tokens were invalid
+                if (validTokens.length !== response2.documents[0].fcm.length) {
+                    tokenUpdates.set(favor, validTokens);
+                }
             }
         }
 
+        await Promise.all(allPromises);
+
+        // Update invalid tokens for all affected users
+        for (const [userId, validTokens] of tokenUpdates) {
+            try {
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    userId,
+                    { fcm: validTokens }
+                );
+            } catch (error) {
+                console.error('Error updating FCM tokens for user:', userId, error);
+            }
+        }
+
+        // Handle followers notifications
         for (const follower of response.documents[0].followers) {
             const response2 = await databases.listDocuments(
                 appwriteConfig.databaseID,
@@ -295,8 +435,6 @@ app.post("/post", async function (req, res) {
                 );
             }
         }
-        
-        await Promise.all(allPromises);
         res.status(200).json({ message: "Successfully sent notification." });
     } catch (error) {
         console.error('Error:', error);

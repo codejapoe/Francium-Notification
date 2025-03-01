@@ -77,6 +77,31 @@ app.post("/follow", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
+        
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: response0.documents[0].$id,
+              description: username + " started following you.",
+              action_id: response0.documents[0].$id,
+              type: "follow",
+            }
+        );
+
+        // Update notifications array
+        const currentNotifications = response.documents[0].notifications || [];
+        await databases.updateDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            response.documents[0].$id,
+            {
+            notifications: [notificationID.$id, ...currentNotifications]
+            }
+        );
+
         const validTokens = [];
         const sendPromises = response.documents[0].fcm.map(async token => {
             try {
@@ -117,7 +142,7 @@ app.post("/follow", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd', 'userID0': '123456asd' }
 app.post("/like", async function (req, res) {
     try {
         const username = req.body.username;
@@ -133,6 +158,30 @@ app.post("/like", async function (req, res) {
         if (!response.documents.length) {
             return res.status(404).json({ error: 'User not found.' });
         }
+
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: req.body.userID0 || "",
+              description: username + " liked your post.",
+              action_id: req.body.userID0 || "",
+              type: "like",
+            }
+        );
+
+        // Update notifications array
+        const currentNotifications = response.documents[0].notifications || [];
+        await databases.updateDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            response.documents[0].$id,
+            {
+            notifications: [notificationID.$id, ...currentNotifications]
+            }
+        );
 
         const validTokens = [];
         const sendPromises = response.documents[0].fcm.map(async token => {
@@ -174,7 +223,7 @@ app.post("/like", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd', 'userID0': '123456asd' }
 app.post("/comment", async function (req, res) {
     try {
         const username = req.body.username;
@@ -190,6 +239,30 @@ app.post("/comment", async function (req, res) {
         if (!response.documents.length) {
             return res.status(404).json({ error: 'User not found.' });
         }
+
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: req.body.userID0 || "",
+              description: username + " commented on your post.",
+              action_id: req.body.userID0 || "",
+              type: "comment",
+            }
+        );
+
+        // Update notifications array
+        const currentNotifications = response.documents[0].notifications || [];
+        await databases.updateDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            response.documents[0].$id,
+            {
+            notifications: [notificationID.$id, ...currentNotifications]
+            }
+        );
 
         const validTokens = [];
         const sendPromises = response.documents[0].fcm.map(async token => {
@@ -230,7 +303,7 @@ app.post("/comment", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd', 'userID0': '123456asd' }
 app.post("/repost", async function (req, res) {
     try {
         const username = req.body.username;
@@ -246,6 +319,30 @@ app.post("/repost", async function (req, res) {
         if (!response.documents.length) {
             return res.status(404).json({ error: 'User not found.' });
         }
+
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: req.body.userID0 || "",
+              description: username + " reposted your post.",
+              action_id: req.body.userID0 || "",
+              type: "repost",
+            }
+        );
+
+        // Update notifications array
+        const currentNotifications = response.documents[0].notifications || [];
+        await databases.updateDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            response.documents[0].$id,
+            {
+            notifications: [notificationID.$id, ...currentNotifications]
+            }
+        );
 
         const validTokens = [];
         const sendPromises = response.documents[0].fcm.map(async token => {
@@ -286,7 +383,7 @@ app.post("/repost", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example', 'userID': '123456asd' }
+// POST { 'username': 'example', 'userID': '123456asd', 'userID0': '123456asd' }
 app.post("/tag", async function (req, res) {
     try {
         const username = req.body.username;
@@ -302,6 +399,30 @@ app.post("/tag", async function (req, res) {
         if (!response.documents.length) {
             return res.status(404).json({ error: 'User not found.' });
         }
+
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: req.body.userID0 || "",
+              description: username + " tagged you in their post.",
+              action_id: req.body.userID0 || "",
+              type: "tag",
+            }
+        );
+
+        // Update notifications array
+        const currentNotifications = response.documents[0].notifications || [];
+        await databases.updateDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.userCollectionID,
+            response.documents[0].$id,
+            {
+            notifications: [notificationID.$id, ...currentNotifications]
+            }
+        );
         
         const validTokens = [];
         const sendPromises = response.documents[0].fcm.map(async token => {
@@ -342,11 +463,10 @@ app.post("/tag", async function (req, res) {
     }
 });
 
-// POST { 'username': 'example' }
+// POST { 'username': 'example', 'postID': '12345678' }
 app.post("/post", async function (req, res) {
     try {
         const username = req.body.username;
-        const notificationID = req.body.notificationID;
         const response = await databases.listDocuments(
             appwriteConfig.databaseID,
             appwriteConfig.userCollectionID,
@@ -359,19 +479,44 @@ app.post("/post", async function (req, res) {
             return res.status(404).json({ error: 'User not found.' });
         }
 
+
         const allPromises = [];
         const tokenUpdates = new Map(); // Track tokens for each user
-        
-        for (const favor of response.documents[0].favors) {
+
+        // Create notification document
+        const notificationID = await databases.createDocument(
+            appwriteConfig.databaseID,
+            appwriteConfig.notificationCollectionID,
+            ID.unique(),
+            {
+              user_id: req.body.userID || "",
+              description: username + " created a post.",
+              action_id: req.body.userID || "",
+              type: "post",
+            }
+        );
+
+        for (const follower of response.documents[0].followers) {
             const response2 = await databases.listDocuments(
                 appwriteConfig.databaseID,
                 appwriteConfig.userCollectionID,
                 [
-                    Query.equal('$id', favor)
+                    Query.equal('$id', follower)
                 ]
             );
-            
+
             if (response2.documents.length) {
+                // Update notifications array
+                const currentNotifications = response2.documents[0].notifications || [];
+                await databases.updateDocument(
+                    appwriteConfig.databaseID,
+                    appwriteConfig.userCollectionID,
+                    response2.documents[0].$id,
+                    {
+                    notifications: [notificationID.$id, ...currentNotifications]
+                    }
+                );
+
                 const validTokens = [];
                 const tokenPromises = response2.documents[0].fcm.map(async token => {
                     try {
@@ -396,7 +541,7 @@ app.post("/post", async function (req, res) {
                 }
             }
         }
-
+        
         await Promise.all(allPromises);
 
         // Update invalid tokens for all affected users
@@ -442,6 +587,6 @@ app.post("/post", async function (req, res) {
     }
 });
   
-app.listen(80, function () {
-    console.log("Server started on port 80");
+app.listen(3000, function () {
+    console.log("Server started on port 3000");
 });

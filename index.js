@@ -2,7 +2,7 @@ import { initializeApp, cert } from 'firebase-admin/app';
 import { getMessaging } from "firebase-admin/messaging";
 import express from "express";
 import cors from "cors";
-import { ID, Client, Account, Databases, Query } from 'appwrite'
+import { ID, Client, Databases, Query } from 'appwrite'
 import { createRequire } from 'module';
 import dotenv from 'dotenv';
 
@@ -30,10 +30,9 @@ const client = new Client();
 
 client.setEndpoint(appwriteConfig.url);
 client.setProject(appwriteConfig.projectId);
+client.setKey(process.env.APPWRITE_API_KEY);
 
-const account = new Account(client);
 const databases = new Databases(client);
-account.createEmailPasswordSession(process.env.EMAIL, process.env.PASSWORD);
 
 const app = express();
 app.use(express.json());

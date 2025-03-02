@@ -32,7 +32,7 @@ const appwriteConfig = {
 client
     .setEndpoint(appwriteConfig.url)
     .setProject(appwriteConfig.projectId)
-    .setJWT(process.env.APPWRITE_API_KEY)
+    .setKey(process.env.APPWRITE_API_KEY)
 ;
 
 client.setEndpoint(appwriteConfig.url);

@@ -33,7 +33,7 @@ client.setProject(appwriteConfig.projectId);
 
 const account = new Account(client);
 const databases = new Databases(client);
-account.createEmailPasswordSession(process.env.USERNAME, process.env.PASSWORD);
+account.createEmailPasswordSession(process.env.EMAIL, process.env.PASSWORD);
 
 const app = express();
 app.use(express.json());

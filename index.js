@@ -2,12 +2,13 @@ import { initializeApp, cert } from 'firebase-admin/app';
 import { getMessaging } from "firebase-admin/messaging";
 import express from "express";
 import cors from "cors";
-import { ID, Client, Databases, Query } from 'appwrite'
 import { createRequire } from 'module';
 import dotenv from 'dotenv';
 
 dotenv.config();
 const require = createRequire(import.meta.url);
+const sdk = require('node-appwrite');
+const { Databases, Query, ID } = sdk;
 
 var serviceAccount = require("./francium-app-firebase-adminsdk-mu0n8-a588c80e12.json");
 
@@ -16,6 +17,8 @@ initializeApp({
   databaseURL: "https://francium-app-default-rtdb.firebaseio.com"
 });
 
+// Init SDK
+const client = new sdk.Client();
 const appwriteConfig = {
     url: 'https://cloud.appwrite.io/v1',
     projectId: 'francium',
@@ -26,7 +29,11 @@ const appwriteConfig = {
     notificationCollectionID: 'notifications',
 }
 
-const client = new Client();
+client
+    .setEndpoint(appwriteConfig.url)
+    .setProject(appwriteConfig.projectId)
+    .setJWT(process.env.APPWRITE_API_KEY)
+;
 
 client.setEndpoint(appwriteConfig.url);
 client.setProject(appwriteConfig.projectId);

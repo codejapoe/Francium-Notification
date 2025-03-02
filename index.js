@@ -47,12 +47,8 @@ app.use(express.json());
 app.use(
   cors({
     origin: "https://francium-app.web.app",
-  })
-);
-
-app.use(
-  cors({
-    methods: ["GET", "POST", "DELETE", "UPDATE", "PUT", "PATCH"],
+    methods: ["POST"],
+    credentials: true
   })
 );
 

@@ -4,10 +4,13 @@ import express from "express";
 import cors from "cors";
 import { ID, Client, Databases, Query } from 'appwrite'
 import { createRequire } from 'module';
+import dotenv from 'dotenv';
 
+dotenv.config();
 const require = createRequire(import.meta.url);
 
 var serviceAccount = require("./francium-app-firebase-adminsdk-mu0n8-a588c80e12.json");
+await account.createEmailPasswordSession(process.env.USERNAME, process.env.PASSWORD);
 
 initializeApp({
   credential: cert(serviceAccount),
